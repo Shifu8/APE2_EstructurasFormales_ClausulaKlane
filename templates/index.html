@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Autómatas</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<h1> Práctica Autómatas APE2</h1>
+
+<select id="opcion">
+    <option value="generar">Generar cadenas</option>
+    <option value="pertenece">Pertenencia</option>
+    <option value="union">Unión</option>
+    <option value="concatenacion">Concatenación</option>
+    <option value="kleene">Kleene *</option>
+    <option value="kleene_plus">Kleene +</option>
+    <option value="crecimiento">Crecimiento del lenguaje</option>
+</select>
+
+<div id="inputs"></div>
+
+<button onclick="enviar()">Ejecutar</button>
+
+<h2>Resultado:</h2>
+<pre id="resultado"></pre>
+
+<script>
+function generarInputs() {
+    let op = document.getElementById("opcion").value;
+    let div = document.getElementById("inputs");
+
+        document.getElementById("resultado").innerText = "";
+
+
+    if (op === "generar") {
+        div.innerHTML = `
+            Alfabeto (a,b): <input id="alfabeto"><br>
+            Longitud: <input id="n">
+        `;
+    } 
+    else if (op === "pertenece") {
+        div.innerHTML = `
+            Cadena: <input id="cadena"><br>
+            Lenguaje (a,ab,ba): <input id="lenguaje">
+        `;
+    }
+    else if (op === "union" || op === "concatenacion") {
+        div.innerHTML = `
+            L1 (a,b): <input id="L1"><br>
+            L2 (b,c): <input id="L2">
+        `;
+    }
+    else if (op === "kleene" || op === "kleene_plus" || op === "crecimiento") {
+        div.innerHTML = `
+            Lenguaje (a,b): <input id="L"><br>
+            Iteraciones: <input id="n">
+        `;
+    }
+}
+
+document.getElementById("opcion").addEventListener("change", generarInputs);
+generarInputs();
+
+function enviar() {
+    let op = document.getElementById("opcion").value;
+    let data = { opcion: op };
+
+    document.querySelectorAll("#inputs input").forEach(input => {
+        data[input.id] = input.value;
+    });
+
+    fetch("/procesar", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("resultado").innerText = JSON.stringify(data, null, 2);
+    });
+}
+</script>
+
+</body>
+</html>
